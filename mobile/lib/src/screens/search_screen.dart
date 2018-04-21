@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:iex_trading_client/data_transfer_objects.dart';
 import 'package:mobile/src/store/app_state.dart';
 import 'package:redux/redux.dart';
 import 'dart:async';
@@ -53,7 +54,7 @@ class SearchScreenViewModel {
     return true;
   }
 
-  get searchTerm => store.state.symbolSearchTerm;
+  String get searchTerm => store.state.screens.search.searchTerm;
 
-  get stockSymbols => stockSymbolSearchSelector(store.state);
+  List<StockSymbol> get stockSymbols => stockSymbolSearchSelector(store.state);
 }

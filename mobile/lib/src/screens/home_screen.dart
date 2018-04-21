@@ -27,7 +27,7 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   new Text(
-                    'You have pushed the button this many times:',
+                    'Child content',
                   )
                 ],
               ),
@@ -42,8 +42,6 @@ class HomeScreenViewModel {
   final BuildContext context;
 
   HomeScreenViewModel(this.store, this.context);
-
-  get count => store.state.count;
 
   navigateToSearchSceen() {
     store.dispatch(new NavigateAction(new Navigation(context, '/search')));

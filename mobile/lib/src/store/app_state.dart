@@ -5,35 +5,43 @@ import 'package:redux/redux.dart';
 import 'package:iex_trading_client/data_transfer_objects.dart';
 
 class AppState {
-  final bool loading;
-  final int count;
+  final ScreenState screens;
   final String currentRoute;
   final List<StockSymbol> symbols;
-  final String symbolSearchTerm;
 
-  AppState({
-    this.loading = false,
-    this.count = 0,
-    this.currentRoute = '/',
-    this.symbols = const <StockSymbol>[],
-    this.symbolSearchTerm = ''
-  });
+  AppState(
+      {this.screens,
+      this.currentRoute = '/',
+      this.symbols = const <StockSymbol>[]});
 
-  factory AppState.initial() => new AppState(loading: true, symbols: []);
+  factory AppState.initial() => new AppState(
+      symbols: [], screens: new ScreenState.initial());
 
-  AppState copyWith({
-    loading,
-    count,
-    currentRoute,
-    symbols,
-    symbolSearchTerm
-  }) {
+  AppState copyWith(
+      {screens, loading, count, currentRoute, symbols, symbolSearchTerm}) {
     return new AppState(
-      loading: loading ?? this.loading,
-      count: count ?? this.count,
-      currentRoute: currentRoute ?? this.currentRoute,
-      symbols: symbols ?? this.symbols,
-      symbolSearchTerm: symbolSearchTerm ?? this.symbolSearchTerm
+        screens: screens ?? this.screens,
+        currentRoute: currentRoute ?? this.currentRoute,
+        symbols: symbols ?? this.symbols);
+  }
+}
+
+class ScreenState {
+  final SearchScreenState search;
+
+  ScreenState({this.search});
+
+  factory ScreenState.initial() => new ScreenState(search: new SearchScreenState());
+}
+
+class SearchScreenState {
+  final String searchTerm;
+
+  SearchScreenState({this.searchTerm = ''});
+
+  SearchScreenState copyWith({searchTerm}) {
+    return new SearchScreenState(
+      searchTerm: searchTerm ?? this.searchTerm
     );
   }
 }
@@ -45,28 +53,38 @@ class Navigation {
   Navigation(this.context, this.route);
 }
 
-final appStateReducer = combineReducers<AppState>([
-  new TypedReducer<AppState, IncrementCounterAction>(incrementCount),
-  new TypedReducer<AppState, NavigateAction>(navigate),
-  new TypedReducer<AppState, FetchSymbolsSuccessAction>(storeSymbols),
-  new TypedReducer<AppState, SetSymbolSearchTermAction>(storeSymbolSearchTerm)
-]);
-
-AppState incrementCount(AppState state, IncrementCounterAction action) {
-  return state.copyWith(count: state.count + 1);
+AppState appStateReducer(AppState state, action) {
+  return new AppState(
+    screens: new TypedReducer<ScreenState, dynamic>(screenStateReducer)(state.screens, action),
+    currentRoute: new TypedReducer<String, NavigateAction>(navigate)(state.currentRoute, action),
+    symbols: new TypedReducer<List<StockSymbol>, FetchSymbolsSuccessAction>(storeSymbols)(state.symbols, action)
+  );
 }
 
-AppState navigate(AppState state, NavigateAction action) {
+ScreenState screenStateReducer(ScreenState state, action) {
+  return new ScreenState(
+    search: new TypedReducer<SearchScreenState, dynamic>(searchScreenReducer)(state.search, action)
+  );
+}
+
+SearchScreenState searchScreenReducer(SearchScreenState state, action) {
+  return new SearchScreenState(
+    searchTerm: new TypedReducer<String, SetSymbolSearchTermAction>(storeSymbolSearchTerm)(state.searchTerm, action)
+  );
+}
+
+String navigate(String state, NavigateAction action) {
   Navigator.of(action.payload.context).pushNamed(action.payload.route);
-  return state.copyWith(currentRoute: action.payload.route);
+  return action.payload.route;
 }
 
-AppState storeSymbols(AppState state, FetchSymbolsSuccessAction action) {
-  return state.copyWith(symbols: action.payload);
+List<StockSymbol> storeSymbols(List<StockSymbol> state, FetchSymbolsSuccessAction action) {
+  return action.payload;
 }
 
-AppState storeSymbolSearchTerm(AppState state, SetSymbolSearchTermAction action) {
-  return state.copyWith(symbolSearchTerm: action.payload);
+String storeSymbolSearchTerm(
+    String state, SetSymbolSearchTermAction action) {
+  return action.payload;
 }
 
 class IncrementCounterAction extends FluxStandardAction {
@@ -82,11 +100,11 @@ class SetSymbolSearchTermAction extends FluxStandardAction<String> {
 }
 
 class FetchSymbolsAction extends IexClientRequestAction {
-  FetchSymbolsAction() : super(new IexClientRequest<List<StockSymbol>>(
-      (client) async => await client.getSymbols(),
-      successAction: (List<StockSymbol> symbols) => new FetchSymbolsSuccessAction(symbols)
-    )
-  );
+  FetchSymbolsAction()
+      : super(new IexClientRequest<List<StockSymbol>>(
+            (client) async => await client.getSymbols(),
+            successAction: (List<StockSymbol> symbols) =>
+                new FetchSymbolsSuccessAction(symbols)));
 }
 
 class FetchSymbolsSuccessAction extends FluxStandardAction<List<StockSymbol>> {
@@ -94,9 +112,13 @@ class FetchSymbolsSuccessAction extends FluxStandardAction<List<StockSymbol>> {
 }
 
 List<StockSymbol> stockSymbolSearchSelector(AppState state) {
-  var searchTerm = state.symbolSearchTerm.toLowerCase();
+  var searchTerm = state.screens.search.searchTerm.toLowerCase();
   if (searchTerm == null || searchTerm.isEmpty) {
     return [];
   }
-  return state.symbols.where((s) => s.name.toLowerCase().startsWith(searchTerm) || s.symbol.toLowerCase().startsWith(searchTerm)).toList();
+  return state.symbols
+      .where((s) =>
+          s.name.toLowerCase().startsWith(searchTerm) ||
+          s.symbol.toLowerCase().startsWith(searchTerm))
+      .toList();
 }
