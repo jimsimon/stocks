@@ -8,21 +8,27 @@ class AppState {
   final ScreenState screens;
   final String currentRoute;
   final List<StockSymbol> symbols;
+  final Map<String, StockSymbol> favoriteSymbols;
+  final Map<String, StockData> stockData;
 
   AppState(
       {this.screens,
       this.currentRoute = '/',
-      this.symbols = const <StockSymbol>[]});
+      this.symbols = const <StockSymbol>[],
+      this.favoriteSymbols = const <String, StockSymbol>{},
+      this.stockData = const <String, StockData>{}});
 
-  factory AppState.initial() => new AppState(
-      symbols: [], screens: new ScreenState.initial());
+  factory AppState.initial() =>
+      new AppState(symbols: [], screens: new ScreenState.initial());
 
   AppState copyWith(
-      {screens, loading, count, currentRoute, symbols, symbolSearchTerm}) {
+      {screens, currentRoute, symbols, favoriteSymbols, stockData}) {
     return new AppState(
         screens: screens ?? this.screens,
         currentRoute: currentRoute ?? this.currentRoute,
-        symbols: symbols ?? this.symbols);
+        symbols: symbols ?? this.symbols,
+        favoriteSymbols: favoriteSymbols ?? this.favoriteSymbols,
+        stockData: stockData ?? this.stockData);
   }
 }
 
@@ -31,7 +37,8 @@ class ScreenState {
 
   ScreenState({this.search});
 
-  factory ScreenState.initial() => new ScreenState(search: new SearchScreenState());
+  factory ScreenState.initial() =>
+      new ScreenState(search: new SearchScreenState());
 }
 
 class SearchScreenState {
@@ -40,9 +47,7 @@ class SearchScreenState {
   SearchScreenState({this.searchTerm = ''});
 
   SearchScreenState copyWith({searchTerm}) {
-    return new SearchScreenState(
-      searchTerm: searchTerm ?? this.searchTerm
-    );
+    return new SearchScreenState(searchTerm: searchTerm ?? this.searchTerm);
   }
 }
 
@@ -55,22 +60,33 @@ class Navigation {
 
 AppState appStateReducer(AppState state, action) {
   return new AppState(
-    screens: new TypedReducer<ScreenState, dynamic>(screenStateReducer)(state.screens, action),
-    currentRoute: new TypedReducer<String, NavigateAction>(navigate)(state.currentRoute, action),
-    symbols: new TypedReducer<List<StockSymbol>, FetchSymbolsSuccessAction>(storeSymbols)(state.symbols, action)
-  );
+      screens: new TypedReducer<ScreenState, dynamic>(screenStateReducer)(
+          state.screens, action),
+      currentRoute: new TypedReducer<String, NavigateAction>(navigate)(
+          state.currentRoute, action),
+      symbols: new TypedReducer<List<StockSymbol>, FetchSymbolsSuccessAction>(
+          storeSymbols)(state.symbols, action),
+      favoriteSymbols: favoriteSymbolsReducer(state.favoriteSymbols, action),
+      stockData: new TypedReducer<Map<String, StockData>,
+              FetchFavoritesDataSuccessAction>(storeStockData)(
+          state.stockData, action));
 }
+
+Reducer<Map<String, StockSymbol>> favoriteSymbolsReducer = combineReducers([
+  new TypedReducer<Map<String, StockSymbol>, ToggleFavoriteStockSymbol>(
+      toggleFavorite),
+]);
 
 ScreenState screenStateReducer(ScreenState state, action) {
   return new ScreenState(
-    search: new TypedReducer<SearchScreenState, dynamic>(searchScreenReducer)(state.search, action)
-  );
+      search: new TypedReducer<SearchScreenState, dynamic>(searchScreenReducer)(
+          state.search, action));
 }
 
 SearchScreenState searchScreenReducer(SearchScreenState state, action) {
   return new SearchScreenState(
-    searchTerm: new TypedReducer<String, SetSymbolSearchTermAction>(storeSymbolSearchTerm)(state.searchTerm, action)
-  );
+      searchTerm: new TypedReducer<String, SetSymbolSearchTermAction>(
+          storeSymbolSearchTerm)(state.searchTerm, action));
 }
 
 String navigate(String state, NavigateAction action) {
@@ -78,13 +94,29 @@ String navigate(String state, NavigateAction action) {
   return action.payload.route;
 }
 
-List<StockSymbol> storeSymbols(List<StockSymbol> state, FetchSymbolsSuccessAction action) {
+List<StockSymbol> storeSymbols(
+    List<StockSymbol> state, FetchSymbolsSuccessAction action) {
   return action.payload;
 }
 
-String storeSymbolSearchTerm(
-    String state, SetSymbolSearchTermAction action) {
+String storeSymbolSearchTerm(String state, SetSymbolSearchTermAction action) {
   return action.payload;
+}
+
+Map<String, StockData> storeStockData(
+    Map<String, StockData> state, FetchFavoritesDataSuccessAction action) {
+  return action.payload;
+}
+
+Map<String, StockSymbol> toggleFavorite(
+    Map<String, StockSymbol> state, ToggleFavoriteStockSymbol action) {
+  var newState = new Map<String, StockSymbol>.from(state);
+  if (newState.containsKey(action.payload.symbol)) {
+    newState.remove(action.payload.symbol);
+  } else {
+    newState[action.payload.symbol] = action.payload;
+  }
+  return newState;
 }
 
 class IncrementCounterAction extends FluxStandardAction {
@@ -97,6 +129,25 @@ class NavigateAction extends FluxStandardAction<Navigation> {
 
 class SetSymbolSearchTermAction extends FluxStandardAction<String> {
   SetSymbolSearchTermAction(String payload) : super(payload: payload);
+}
+
+class ToggleFavoriteStockSymbol extends FluxStandardAction<StockSymbol> {
+  ToggleFavoriteStockSymbol(StockSymbol payload) : super(payload: payload);
+}
+
+class FetchFavoritesDataAction extends IexClientRequestAction {
+  FetchFavoritesDataAction(Map<String, StockSymbol> favorites)
+      : super(new IexClientRequest(
+            (client) async =>
+                await client.getBatchStockData(favorites.keys.toList()),
+            successAction: (Map<String, StockData> stockDataMap) =>
+                new FetchFavoritesDataSuccessAction(stockDataMap)));
+}
+
+class FetchFavoritesDataSuccessAction
+    extends FluxStandardAction<Map<String, StockData>> {
+  FetchFavoritesDataSuccessAction(Map<String, StockData> stockDataMap)
+      : super(payload: stockDataMap);
 }
 
 class FetchSymbolsAction extends IexClientRequestAction {

@@ -6,17 +6,23 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:mobile/src/store/app_state.dart';
 import 'package:mobile/src/screens/home_screen.dart';
 import 'package:iex_trading_client/vm_client.dart';
+import 'dart:async';
 
 final store =
-    new Store<AppState>(
-        appStateReducer,
-        initialState: new AppState.initial(),
-      middleware: [
-        new IexClientMiddleware(new VmClient())
-      ]
-    );
+new Store<AppState>(
+  appStateReducer,
+  initialState: new AppState.initial(),
+  middleware: [
+    new IexClientMiddleware(new VmClient())
+  ]
+);
 
-void main() => runApp(new StocksApp(store: store));
+void main() {
+  new Timer.periodic(new Duration(seconds: 3), (Timer timer) {
+    store.dispatch(new FetchFavoritesDataAction(store.state.favoriteSymbols));
+  });
+  runApp(new StocksApp(store: store));
+}
 
 class StocksApp extends StatelessWidget {
   final Store<AppState> store;
@@ -26,16 +32,14 @@ class StocksApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new StoreProvider<AppState>(
-        store: store,
-        child: new MaterialApp(
-          title: 'Stocks App',
-          theme: new ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          routes: {
-            '/': (_) => new HomeScreen(title: 'Stocks App'),
-            '/search': (_) => new SearchScreen(store)
-          }
-        ));
+      store: store,
+      child: new MaterialApp(
+        title: 'Stocks App',
+        theme: new ThemeData.dark(),
+        routes: {
+          '/': (_) => new HomeScreen(title: 'Stocks App'),
+          '/search': (_) => new SearchScreen(store)
+        }
+      ));
   }
 }

@@ -32,8 +32,8 @@ class SearchScreen extends StatelessWidget {
                         title: new Text(stockSymbol.name),
                         subtitle: new Text(stockSymbol.symbol),
                         trailing: new IconButton(
-                            icon: new Icon(Icons.add_circle_outline),
-                            onPressed: () => {}));
+                            icon: viewModel.getFavoriteIcon(stockSymbol),
+                            onPressed: () => viewModel.onAddFavoriteToggled(stockSymbol)));
                   })));
     });
   }
@@ -54,7 +54,20 @@ class SearchScreenViewModel {
     return true;
   }
 
+  onAddFavoriteToggled(StockSymbol stockSymbol) {
+    store.dispatch(new ToggleFavoriteStockSymbol(stockSymbol));
+  }
+
+  isFavoriteStock(StockSymbol stockSymbol) {
+    return store.state.favoriteSymbols.containsKey(stockSymbol.symbol);
+  }
+
   String get searchTerm => store.state.screens.search.searchTerm;
 
   List<StockSymbol> get stockSymbols => stockSymbolSearchSelector(store.state);
+
+  Icon getFavoriteIcon(StockSymbol stockSymbol) {
+    var icon = isFavoriteStock(stockSymbol) ? Icons.check_circle : Icons.add_circle_outline;
+    return new Icon(icon);
+  }
 }
