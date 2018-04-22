@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/src/store/middleware/iex_client_middleware.dart';
-import 'package:mobile/src/store/util/fsa.dart';
 import 'package:redux/redux.dart';
 import 'package:iex_trading_client/data_transfer_objects.dart';
 
@@ -90,22 +89,22 @@ SearchScreenState searchScreenReducer(SearchScreenState state, action) {
 }
 
 String navigate(String state, NavigateAction action) {
-  Navigator.of(action.payload.context).pushNamed(action.payload.route);
-  return action.payload.route;
+  Navigator.of(action.navigation.context).pushNamed(action.navigation.route);
+  return action.navigation.route;
 }
 
 List<StockSymbol> storeSymbols(
     List<StockSymbol> state, FetchSymbolsSuccessAction action) {
-  return action.payload;
+  return action.symbols;
 }
 
 String storeSymbolSearchTerm(String state, SetSymbolSearchTermAction action) {
-  return action.payload;
+  return action.searchTerm;
 }
 
 Map<String, StockData> storeStockData(
     Map<String, StockData> state, FetchFavoritesDataSuccessAction action) {
-  return action.payload;
+  return action.stockDataMap;
 }
 
 Map<String, StockSymbol> toggleFavorite(
@@ -119,47 +118,67 @@ Map<String, StockSymbol> toggleFavorite(
   return newState;
 }
 
-class IncrementCounterAction extends FluxStandardAction {
-  IncrementCounterAction() : super();
+class IncrementCounterAction {}
+
+class NavigateAction {
+  final Navigation navigation;
+
+  NavigateAction(this.navigation);
 }
 
-class NavigateAction extends FluxStandardAction<Navigation> {
-  NavigateAction(Navigation payload) : super(payload: payload);
+class SetSymbolSearchTermAction {
+  final String searchTerm;
+
+  SetSymbolSearchTermAction(this.searchTerm);
 }
 
-class SetSymbolSearchTermAction extends FluxStandardAction<String> {
-  SetSymbolSearchTermAction(String payload) : super(payload: payload);
+class ToggleFavoriteStockSymbol {
+  final StockSymbol payload;
+
+  ToggleFavoriteStockSymbol(this.payload);
 }
 
-class ToggleFavoriteStockSymbol extends FluxStandardAction<StockSymbol> {
-  ToggleFavoriteStockSymbol(StockSymbol payload) : super(payload: payload);
+class FetchFavoritesDataAction
+    extends IexClientRequestAction<Map<String, StockData>> {
+  final Map<String, StockSymbol> favorites;
+
+  FetchFavoritesDataAction(this.favorites);
+
+  @override
+  RequestFunction<Map<String, StockData>> get request =>
+      (client) async => await client.getBatchStockData(favorites.keys.toList());
+
+  @override
+  get successAction => (Map<String, StockData> stockDataMap) =>
+      new FetchFavoritesDataSuccessAction(stockDataMap);
+
+  @override
+  get errorAction => null;
 }
 
-class FetchFavoritesDataAction extends IexClientRequestAction {
-  FetchFavoritesDataAction(Map<String, StockSymbol> favorites)
-      : super(new IexClientRequest(
-            (client) async =>
-                await client.getBatchStockData(favorites.keys.toList()),
-            successAction: (Map<String, StockData> stockDataMap) =>
-                new FetchFavoritesDataSuccessAction(stockDataMap)));
+class FetchFavoritesDataSuccessAction {
+  final Map<String, StockData> stockDataMap;
+
+  FetchFavoritesDataSuccessAction(this.stockDataMap);
 }
 
-class FetchFavoritesDataSuccessAction
-    extends FluxStandardAction<Map<String, StockData>> {
-  FetchFavoritesDataSuccessAction(Map<String, StockData> stockDataMap)
-      : super(payload: stockDataMap);
+class FetchSymbolsAction extends IexClientRequestAction<List<StockSymbol>> {
+  @override
+  RequestFunction<List<StockSymbol>> get request =>
+      (client) async => await client.getSymbols();
+
+  @override
+  get successAction =>
+      (List<StockSymbol> symbols) => new FetchSymbolsSuccessAction(symbols);
+
+  @override
+  get errorAction => null;
 }
 
-class FetchSymbolsAction extends IexClientRequestAction {
-  FetchSymbolsAction()
-      : super(new IexClientRequest<List<StockSymbol>>(
-            (client) async => await client.getSymbols(),
-            successAction: (List<StockSymbol> symbols) =>
-                new FetchSymbolsSuccessAction(symbols)));
-}
+class FetchSymbolsSuccessAction {
+  final List<StockSymbol> symbols;
 
-class FetchSymbolsSuccessAction extends FluxStandardAction<List<StockSymbol>> {
-  FetchSymbolsSuccessAction(symbols) : super(payload: symbols);
+  FetchSymbolsSuccessAction(this.symbols);
 }
 
 List<StockSymbol> stockSymbolSearchSelector(AppState state) {

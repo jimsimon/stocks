@@ -1,27 +1,15 @@
 import 'package:iex_trading_client/api_client.dart';
 import 'package:mobile/src/store/app_state.dart';
-import 'package:mobile/src/store/util/fsa.dart';
 import 'package:redux/redux.dart';
 import 'dart:async';
 
 typedef Future<T> RequestFunction<T>(ApiClient client);
-typedef FluxStandardAction<T> SuccessFunction<T>(T response);
-typedef FluxStandardAction<T> ErrorFunction<T>(error);
 
-class IexClientRequest<T> {
-  final RequestFunction<T> request;
-  final Function successAction;
-  final Function errorAction;
-  final Function completeAction;
-
-  IexClientRequest(this.request,
-      {this.successAction,
-      this.errorAction,
-      this.completeAction});
-}
-
-class IexClientRequestAction extends FluxStandardAction<IexClientRequest> {
-  IexClientRequestAction(IexClientRequest payload) : super(payload: payload);
+abstract class IexClientRequestAction<T> {
+  RequestFunction<T> get request;
+  Function get successAction;
+  Function get errorAction;
+  Function get completeAction => null;
 }
 
 class IexClientMiddleware extends MiddlewareClass<AppState> {
@@ -33,19 +21,19 @@ class IexClientMiddleware extends MiddlewareClass<AppState> {
   void call(Store<AppState> store, action, NextDispatcher next) async {
     if (action is IexClientRequestAction) {
       try {
-        var response = await action.payload.request(client);
-        var successAction = action.payload.successAction;
+        var response = await action.request(client);
+        var successAction = action.successAction;
         if (successAction != null) {
           store.dispatch(successAction(response));
         }
       } catch (e) {
         print(e);
-        var errorAction = action.payload.errorAction;
+        var errorAction = action.errorAction;
         if (errorAction != null) {
           store.dispatch(errorAction(e));
         }
       } finally {
-        var completeAction = action.payload.completeAction;
+        var completeAction = action.completeAction;
         if (completeAction != null) {
           store.dispatch(completeAction());
         }
