@@ -14,7 +14,7 @@ abstract class ApiClient {
     String url = baseUrl + urlFragment;
     print(url);
     final response = await client.send(new Request('GET', url));
-//    await client.close();
+    await client.close();
 
     if (response.statusCode < 200 || response.statusCode >= 400) {
       throw new ApiException(response.statusCode, response.reasonPhrase);
