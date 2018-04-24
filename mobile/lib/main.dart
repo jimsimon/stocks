@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/src/screens/search_screen.dart';
+import 'package:mobile/src/screens/settings_screen.dart';
 import 'package:mobile/src/store/middleware/iex_client_middleware.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -38,7 +39,8 @@ class StocksApp extends StatelessWidget {
         theme: new ThemeData.dark(),
         routes: {
           '/': (_) => new HomeScreen(title: 'Stocks App'),
-          '/search': (_) => new SearchScreen(store)
+          '/search': (_) => new SearchScreen(store),
+          '/settings': (_) => new SettingsScreen()
         }
       ));
   }

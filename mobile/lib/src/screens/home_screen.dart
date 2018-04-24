@@ -23,7 +23,24 @@ class HomeScreen extends StatelessWidget {
                       onPressed: viewModel.navigateToSearchSceen)
                 ],
               ),
-              drawer: new Drawer(),
+              drawer: new Drawer(
+                  child: new ListView(
+                      // Important: Remove any padding from the ListView.
+                      padding: EdgeInsets.zero,
+                      children: <Widget>[
+                    new UserAccountsDrawerHeader(
+                      accountName: new Text('Jim Simon'),
+                      accountEmail: new Text('jim.j.simon@gmail.com'),
+                      currentAccountPicture: new CircleAvatar(),
+                    ),
+                    new ListTile(
+                      leading: new Icon(Icons.settings),
+                      title: new Text('Settings'),
+                      onTap: () {
+                        Navigator.of(context).pushNamed('/settings');
+                      },
+                    ),
+                  ])),
               body: buildBody(context, viewModel));
         });
   }
@@ -61,21 +78,29 @@ class HomeScreen extends StatelessWidget {
   Widget buildFavoritesList(
       BuildContext context, HomeScreenViewModel viewModel) {
     return new Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-      new Text('Favorites'),
-      new Card(
-          child: new ListView.builder(
-              shrinkWrap: true,
-              itemCount: viewModel.stockData.length,
-              itemBuilder: (buildContext, index) {
-                var stock = viewModel.stockData.values.elementAt(index);
-                return new ListTile(
-                    title: new Text(stock.quote.symbol),
-                    trailing: new Text(
-                        '\$' + stock.quote.latestPrice.toStringAsFixed(2)));
-              }))
-    ]);
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          new Text('Favorites'),
+          new Card(
+              child: new ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: viewModel.favoriteSymbols.length,
+                  itemBuilder: (buildContext, index) {
+                    var stockSymbol =
+                        viewModel.favoriteSymbols.values.elementAt(index);
+                    var stockData = viewModel.stockData[stockSymbol.symbol];
+                    return new ListTile(
+                        title: new Text(stockSymbol.symbol),
+                        trailing: buildStockPrice(stockData));
+                  }))
+        ]);
+  }
+
+  Widget buildStockPrice(StockData stockData) {
+    if (stockData != null) {
+      return new Text('\$' + stockData.quote.latestPrice.toStringAsFixed(2));
+    }
+    return new CircularProgressIndicator();
   }
 }
 
