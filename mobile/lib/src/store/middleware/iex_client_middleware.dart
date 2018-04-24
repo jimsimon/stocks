@@ -21,10 +21,13 @@ class IexClientMiddleware extends MiddlewareClass<AppState> {
   void call(Store<AppState> store, action, NextDispatcher next) async {
     if (action is IexClientRequestAction) {
       try {
-        var response = await action.request(client);
-        var successAction = action.successAction;
-        if (successAction != null) {
-          store.dispatch(successAction(response));
+        var requestFunction = action.request;
+        if (requestFunction != null) {
+          var response = await requestFunction(client);
+          var successAction = action.successAction;
+          if (successAction != null) {
+            store.dispatch(successAction(response));
+          }
         }
       } catch (e) {
         print(e);
