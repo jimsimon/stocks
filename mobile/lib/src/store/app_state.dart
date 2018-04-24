@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/src/store/middleware/iex_client_middleware.dart';
+import 'package:mobile/src/store/screen_state.dart';
 import 'package:redux/redux.dart';
 import 'package:iex_trading_client/data_transfer_objects.dart';
 
@@ -31,25 +32,6 @@ class AppState {
   }
 }
 
-class ScreenState {
-  final SearchScreenState search;
-
-  ScreenState({this.search});
-
-  factory ScreenState.initial() =>
-      new ScreenState(search: new SearchScreenState());
-}
-
-class SearchScreenState {
-  final String searchTerm;
-
-  SearchScreenState({this.searchTerm = ''});
-
-  SearchScreenState copyWith({searchTerm}) {
-    return new SearchScreenState(searchTerm: searchTerm ?? this.searchTerm);
-  }
-}
-
 class Navigation {
   final BuildContext context;
   final String route;
@@ -65,27 +47,11 @@ AppState appStateReducer(AppState state, action) {
           state.currentRoute, action),
       symbols: new TypedReducer<List<StockSymbol>, FetchSymbolsSuccessAction>(
           storeSymbols)(state.symbols, action),
-      favoriteSymbols: favoriteSymbolsReducer(state.favoriteSymbols, action),
+      favoriteSymbols: new TypedReducer<Map<String, StockSymbol>, ToggleFavoriteStockSymbol>(
+        toggleFavorite)(state.favoriteSymbols, action),
       stockData: new TypedReducer<Map<String, StockData>,
               FetchFavoritesDataSuccessAction>(storeStockData)(
           state.stockData, action));
-}
-
-Reducer<Map<String, StockSymbol>> favoriteSymbolsReducer = combineReducers([
-  new TypedReducer<Map<String, StockSymbol>, ToggleFavoriteStockSymbol>(
-      toggleFavorite),
-]);
-
-ScreenState screenStateReducer(ScreenState state, action) {
-  return new ScreenState(
-      search: new TypedReducer<SearchScreenState, dynamic>(searchScreenReducer)(
-          state.search, action));
-}
-
-SearchScreenState searchScreenReducer(SearchScreenState state, action) {
-  return new SearchScreenState(
-      searchTerm: new TypedReducer<String, SetSymbolSearchTermAction>(
-          storeSymbolSearchTerm)(state.searchTerm, action));
 }
 
 String navigate(String state, NavigateAction action) {
@@ -96,10 +62,6 @@ String navigate(String state, NavigateAction action) {
 List<StockSymbol> storeSymbols(
     List<StockSymbol> state, FetchSymbolsSuccessAction action) {
   return action.symbols;
-}
-
-String storeSymbolSearchTerm(String state, SetSymbolSearchTermAction action) {
-  return action.searchTerm;
 }
 
 Map<String, StockData> storeStockData(
@@ -124,12 +86,6 @@ class NavigateAction {
   final Navigation navigation;
 
   NavigateAction(this.navigation);
-}
-
-class SetSymbolSearchTermAction {
-  final String searchTerm;
-
-  SetSymbolSearchTermAction(this.searchTerm);
 }
 
 class ToggleFavoriteStockSymbol {
