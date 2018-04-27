@@ -10,6 +10,7 @@ class AppState {
   final List<StockSymbol> symbols;
   final Map<String, StockSymbol> favoriteSymbols;
   final Map<String, StockData> stockData;
+  final List<int> lockCode = [1,2,3,4];
 
   AppState(
       {this.screens,
