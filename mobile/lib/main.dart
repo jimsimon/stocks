@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile/src/screens/lock_screen.dart';
+import 'package:mobile/src/widgets/pin_entry.dart';
 import 'package:mobile/src/screens/search_screen.dart';
 import 'package:mobile/src/screens/settings_screen.dart';
 import 'package:mobile/src/store/middleware/iex_client_middleware.dart';
@@ -75,27 +76,17 @@ class StocksAppState extends State<StocksApp> with WidgetsBindingObserver {
               '/': (_) => new HomeScreen(title: 'Stocks App'),
               '/search': (_) => new SearchScreen(store),
               '/settings': (_) => new SettingsScreen(),
-              '/lock_screen': (_) => new LockScreen(
-                  title: new Text('Enter PIN',
-                      textScaleFactor: 1.5,
-                      style: Theme
-                          .of(navigatorKey.currentContext)
-                          .textTheme
-                          .title),
-                  pinSize: 4,
-                  onCodeEntered: (List<int> digits) {
-                    for (var i = 0; i < digits.length; i++) {
-                      if (digits[i] != store.state.lockCode[i]) {
-                        return false;
-                      }
-                    }
-                    setState(() {
-                      locked = false;
-                    });
-                    navigatorKey.currentState.pop();
-                    return true;
-                  })
+              '/lock_screen': (context) => new LockScreen(onSuccess: unlockApp(context))
             }));
+  }
+
+  Function unlockApp(BuildContext context) {
+    return () {
+      setState(() {
+        locked = false;
+      });
+      Navigator.of(context).pop();
+    };
   }
 
   void createTimer() {
