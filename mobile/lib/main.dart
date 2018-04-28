@@ -76,17 +76,15 @@ class StocksAppState extends State<StocksApp> with WidgetsBindingObserver {
               '/': (_) => new HomeScreen(title: 'Stocks App'),
               '/search': (_) => new SearchScreen(store),
               '/settings': (_) => new SettingsScreen(),
-              '/lock_screen': (context) => new LockScreen(onSuccess: unlockApp(context))
+              '/lock_screen': (context) => new LockScreen(onSuccess: unlockApp)
             }));
   }
 
-  Function unlockApp(BuildContext context) {
-    return () {
-      setState(() {
-        locked = false;
-      });
-      Navigator.of(context).pop();
-    };
+  void unlockApp(BuildContext context) {
+    setState(() {
+      locked = false;
+    });
+    Navigator.of(context).pop();
   }
 
   void createTimer() {
