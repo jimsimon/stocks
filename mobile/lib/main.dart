@@ -1,10 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:iex_trading_client/api_client.dart';
 import 'package:mobile/src/screens/lock_screen.dart';
-import 'package:mobile/src/widgets/pin_entry.dart';
+import 'package:mobile/src/screens/login_screen.dart';
 import 'package:mobile/src/screens/search_screen.dart';
 import 'package:mobile/src/screens/settings_screen.dart';
-import 'package:mobile/src/store/middleware/iex_client_middleware.dart';
+import 'package:mobile/src/screens/sign_up_screen.dart';
+import 'package:mobile/src/store/middleware/service_middleware.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:mobile/src/store/app_state.dart';
@@ -14,7 +17,10 @@ import 'dart:async';
 
 final store = new Store<AppState>(appStateReducer,
     initialState: new AppState.initial(),
-    middleware: [new IexClientMiddleware(new VmClient())]);
+    middleware: [new ServiceMiddleware({
+      ApiClient: new VmClient(),
+      FirebaseAuth: FirebaseAuth.instance
+    })]);
 
 void main() {
   SystemChrome.setPreferredOrientations([
@@ -72,7 +78,10 @@ class StocksAppState extends State<StocksApp> with WidgetsBindingObserver {
             title: 'Stocks App',
             theme: new ThemeData.dark(),
             navigatorKey: navigatorKey,
+            initialRoute: '/',
             routes: {
+              '/login': (_) => new LoginScreen(),
+              '/signUp': (_) => new SignUpScreen(),
               '/': (_) => new HomeScreen(title: 'Stocks App'),
               '/search': (_) => new SearchScreen(store),
               '/settings': (_) => new SettingsScreen(),

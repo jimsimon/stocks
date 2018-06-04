@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/src/store/middleware/iex_client_middleware.dart';
+import 'package:iex_trading_client/api_client.dart';
+import 'package:mobile/src/store/middleware/service_middleware.dart';
 import 'package:mobile/src/store/screen_state.dart';
 import 'package:redux/redux.dart';
 import 'package:iex_trading_client/data_transfer_objects.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AppState {
   final ScreenState screens;
@@ -10,26 +12,29 @@ class AppState {
   final List<StockSymbol> symbols;
   final Map<String, StockSymbol> favoriteSymbols;
   final Map<String, StockData> stockData;
-  final List<int> lockCode = [1,2,3,4];
+  final List<int> lockCode = [1, 2, 3, 4];
+  final FirebaseUser user;
 
   AppState(
       {this.screens,
       this.currentRoute = '/',
       this.symbols = const <StockSymbol>[],
       this.favoriteSymbols = const <String, StockSymbol>{},
-      this.stockData = const <String, StockData>{}});
+      this.stockData = const <String, StockData>{},
+      this.user});
 
   factory AppState.initial() =>
       new AppState(symbols: [], screens: new ScreenState.initial());
 
   AppState copyWith(
-      {screens, currentRoute, symbols, favoriteSymbols, stockData}) {
+      {screens, currentRoute, symbols, favoriteSymbols, stockData, user}) {
     return new AppState(
         screens: screens ?? this.screens,
         currentRoute: currentRoute ?? this.currentRoute,
         symbols: symbols ?? this.symbols,
         favoriteSymbols: favoriteSymbols ?? this.favoriteSymbols,
-        stockData: stockData ?? this.stockData);
+        stockData: stockData ?? this.stockData,
+        user: user ?? this.user);
   }
 }
 
@@ -48,8 +53,9 @@ AppState appStateReducer(AppState state, action) {
           state.currentRoute, action),
       symbols: new TypedReducer<List<StockSymbol>, FetchSymbolsSuccessAction>(
           storeSymbols)(state.symbols, action),
-      favoriteSymbols: new TypedReducer<Map<String, StockSymbol>, ToggleFavoriteStockSymbol>(
-        toggleFavorite)(state.favoriteSymbols, action),
+      favoriteSymbols:
+          new TypedReducer<Map<String, StockSymbol>, ToggleFavoriteStockSymbol>(
+              toggleFavorite)(state.favoriteSymbols, action),
       stockData: new TypedReducer<Map<String, StockData>,
               FetchFavoritesDataSuccessAction>(storeStockData)(
           state.stockData, action));
@@ -89,6 +95,28 @@ class NavigateAction {
   NavigateAction(this.navigation);
 }
 
+class AuthenticateUserAction
+    extends CallServiceAction<FirebaseUser> {
+  final String email;
+  final String password;
+
+  AuthenticateUserAction(this.email, this.password);
+
+  @override
+  Function get errorAction => null;
+
+  @override
+  RequestFunction<FirebaseUser> get request =>
+      (service) => service.createUserWithEmailAndPassword(
+          email: email, password: password);
+
+  @override
+  Type get serviceType => FirebaseAuth;
+
+  @override
+  Function get successAction => null;
+}
+
 class ToggleFavoriteStockSymbol {
   final StockSymbol payload;
 
@@ -96,7 +124,7 @@ class ToggleFavoriteStockSymbol {
 }
 
 class FetchFavoritesDataAction
-    extends IexClientRequestAction<Map<String, StockData>> {
+    extends CallServiceAction<Map<String, StockData>> {
   final Map<String, StockSymbol> favorites;
 
   FetchFavoritesDataAction(this.favorites);
@@ -111,6 +139,9 @@ class FetchFavoritesDataAction
 
   @override
   get errorAction => null;
+
+  @override
+  Type get serviceType => ApiClient;
 }
 
 class FetchFavoritesDataSuccessAction {
@@ -119,7 +150,7 @@ class FetchFavoritesDataSuccessAction {
   FetchFavoritesDataSuccessAction(this.stockDataMap);
 }
 
-class FetchSymbolsAction extends IexClientRequestAction<List<StockSymbol>> {
+class FetchSymbolsAction extends CallServiceAction<List<StockSymbol>> {
   @override
   RequestFunction<List<StockSymbol>> get request =>
       (client) async => await client.getSymbols();
@@ -130,6 +161,10 @@ class FetchSymbolsAction extends IexClientRequestAction<List<StockSymbol>> {
 
   @override
   get errorAction => null;
+
+  // TODO: implement serviceType
+  @override
+  Type get serviceType => ApiClient;
 }
 
 class FetchSymbolsSuccessAction {

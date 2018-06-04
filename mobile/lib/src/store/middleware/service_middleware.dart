@@ -3,27 +3,29 @@ import 'package:mobile/src/store/app_state.dart';
 import 'package:redux/redux.dart';
 import 'dart:async';
 
-typedef Future<T> RequestFunction<T>(ApiClient client);
+typedef Future<T> RequestFunction<T>(dynamic service);
 
-abstract class IexClientRequestAction<T> {
+abstract class CallServiceAction<T> {
+  Type get serviceType;
   RequestFunction<T> get request;
   Function get successAction;
   Function get errorAction;
   Function get completeAction => null;
 }
 
-class IexClientMiddleware extends MiddlewareClass<AppState> {
-  final ApiClient client;
+class ServiceMiddleware extends MiddlewareClass<AppState> {
+  final Map <Type, dynamic> serviceMap;
 
-  IexClientMiddleware(this.client);
+  ServiceMiddleware(this.serviceMap);
 
   @override
   void call(Store<AppState> store, action, NextDispatcher next) async {
-    if (action is IexClientRequestAction) {
+    if (action is CallServiceAction) {
+      var service = serviceMap[action.serviceType];
       try {
         var requestFunction = action.request;
         if (requestFunction != null) {
-          var response = await requestFunction(client);
+          var response = await requestFunction(service);
           var successAction = action.successAction;
           if (successAction != null) {
             store.dispatch(successAction(response));
