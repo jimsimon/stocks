@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "558201533215",
+    "firebase_url": "https://stock-market-app-ba480.firebaseio.com",
+    "project_id": "stock-market-app-ba480",
+    "storage_bucket": "stock-market-app-ba480.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558201533215:android:ec6da6f8e54d9334",
+        "android_client_info": {
+          "package_name": "net.jimsimon.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "558201533215-ma8q1spf14ark3cou1om5de5kkqisaqn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-QD8pfBzMCKuaWx6L0nnxMvcR1SbE9Os"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
