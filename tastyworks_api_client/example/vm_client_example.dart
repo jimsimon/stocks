@@ -1,7 +1,8 @@
 import 'package:tastyworks_api_client/clients/vm_client.dart';
-import 'package:tastyworks_api_client/services/account-service.dart';
-import 'package:tastyworks_api_client/services/session-service.dart';
-import 'package:tastyworks_api_client/services/watchlist-service.dart';
+import 'package:tastyworks_api_client/services/account_service.dart';
+import 'package:tastyworks_api_client/services/session_service.dart';
+import 'package:tastyworks_api_client/services/symbol_service.dart';
+import 'package:tastyworks_api_client/services/watchlist_service.dart';
 
 void main(List<String> args) async {
   final VmClient client = VmClient();
@@ -29,4 +30,11 @@ void main(List<String> args) async {
   final watchlistService = WatchlistService(client, sessionToken);
   var watchlists = await watchlistService.getWatchlists();
   print(watchlists);
+  
+  final symbolService = SymbolService(client);
+  var searchResults = await symbolService.searchSymbols('Vang');
+  print(searchResults);
+  
+  var stockSymbols = await symbolService.getSymbols(['SPY', 'V']);
+  print(stockSymbols);
 }

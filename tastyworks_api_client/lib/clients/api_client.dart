@@ -10,8 +10,10 @@ abstract class ApiClient {
 
   ApiClient({this.baseUrl = 'https://api.tastyworks.com'});
 
-  Future<ApiResponse> request(urlFragment, method, {params, sessionToken}) async {
-    String url = baseUrl + urlFragment;
+  Future<dynamic> rawRequest(urlFragment, method,
+    {params, sessionToken, baseUrl}) async {
+    var rootUrl = baseUrl != null ? baseUrl : this.baseUrl;
+    String url = rootUrl + urlFragment;
     var headers = {
       'Content-Type': 'application/json'
     };
@@ -30,7 +32,14 @@ abstract class ApiClient {
     }
 
     var jsonString = await response.readAsString();
-    return ApiResponse.fromJson(json.decode(jsonString));
+    return json.decode(jsonString);
+  }
+
+  Future<ApiResponse> request(urlFragment, method,
+    {params, sessionToken}) async {
+    var json = await this.rawRequest(
+      urlFragment, method, params: params, sessionToken: sessionToken);
+    return ApiResponse.fromJson(json);
   }
 }
 
