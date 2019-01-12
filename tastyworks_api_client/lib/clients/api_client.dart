@@ -1,12 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http_client/http_client.dart';
-import 'package:tastyworks_api_client/models/account_with_level.dart';
 import 'package:tastyworks_api_client/models/api_response.dart';
-import 'package:tastyworks_api_client/models/balance.dart';
-import 'package:tastyworks_api_client/models/position.dart';
-import 'package:tastyworks_api_client/models/session.dart';
-import 'package:tastyworks_api_client/models/session_validation.dart';
 
 abstract class ApiClient {
   final String baseUrl;
@@ -15,7 +10,7 @@ abstract class ApiClient {
 
   ApiClient({this.baseUrl = 'https://api.tastyworks.com'});
 
-  dynamic _makeRequest(urlFragment, method, {params, sessionToken}) async {
+  Future<ApiResponse> request(urlFragment, method, {params, sessionToken}) async {
     String url = baseUrl + urlFragment;
     var headers = {
       'Content-Type': 'application/json'
@@ -36,43 +31,6 @@ abstract class ApiClient {
 
     var jsonString = await response.readAsString();
     return ApiResponse.fromJson(json.decode(jsonString));
-  }
-
-  Future<Session> createSession(String login, String password) async {
-    ApiResponse response = await _makeRequest('/sessions', 'POST', params: {
-      "login": login,
-      "password": password
-    });
-    return Session.fromJson(response.data);
-  }
-
-  Future<SessionValidation> validateSession(String sessionToken) async {
-    ApiResponse response = await _makeRequest('/sessions/validate', 'POST',
-      sessionToken: sessionToken
-    );
-    return SessionValidation.fromJson(response.data);
-  }
-
-  Future<List<AccountWithLevel>> getAccounts(String sessionToken) async {
-    ApiResponse response = await _makeRequest('/customers/me/accounts', 'GET',
-      sessionToken: sessionToken
-    );
-    return (response.data['items'] as List).map((json) =>
-      AccountWithLevel.fromJson(json)).toList();
-  }
-
-  Future<Balance> getBalances(String sessionToken, String accountNumber) async {
-    ApiResponse response = await _makeRequest(
-      '/accounts/$accountNumber/balances', 'GET', sessionToken: sessionToken);
-    return Balance.fromJson(response.data);
-  }
-
-  Future<List<Position>> getPositions(String sessionToken,
-    String accountNumber) async {
-    ApiResponse response = await _makeRequest(
-      '/accounts/$accountNumber/positions', 'GET', sessionToken: sessionToken);
-    return (response.data['items'] as List).map((json) =>
-      Position.fromJson(json)).toList();
   }
 }
 
