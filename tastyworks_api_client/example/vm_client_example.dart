@@ -1,4 +1,4 @@
-import 'package:tastyworks_api_client/vm_client.dart';
+import 'package:tastyworks_api_client/clients/vm_client.dart';
 
 void main(List<String> args) async {
   final VmClient client = new VmClient();

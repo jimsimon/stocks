@@ -1,4 +1,4 @@
-import 'package:tastyworks_api_client/api_client.dart';
+import 'package:tastyworks_api_client/clients/api_client.dart';
 import 'package:http_client/http_client.dart';
 import 'package:http_client/console.dart';
 
