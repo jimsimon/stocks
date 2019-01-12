@@ -1,7 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http_client/http_client.dart';
-import 'package:tastyworks_api_client/data_transfer_objects.dart';
+import 'package:tastyworks_api_client/models/account_with_level.dart';
+import 'package:tastyworks_api_client/models/api_response.dart';
+import 'package:tastyworks_api_client/models/balance.dart';
+import 'package:tastyworks_api_client/models/position.dart';
+import 'package:tastyworks_api_client/models/session.dart';
+import 'package:tastyworks_api_client/models/session_validation.dart';
 
 abstract class ApiClient {
   final String baseUrl;
@@ -25,7 +30,8 @@ abstract class ApiClient {
     await client.close();
 
     if (response.statusCode < 200 || response.statusCode >= 400) {
-      throw new ApiException(response.statusCode, response.reasonPhrase, await response.readAsString());
+      throw new ApiException(response.statusCode, response.reasonPhrase,
+        await response.readAsString());
     }
 
     var jsonString = await response.readAsString();
@@ -51,19 +57,23 @@ abstract class ApiClient {
     ApiResponse response = await _makeRequest('/customers/me/accounts', 'GET',
       sessionToken: sessionToken
     );
-    return (response.data['items'] as List).map((json) => AccountWithLevel.fromJson(json)).toList();
+    return (response.data['items'] as List).map((json) =>
+      AccountWithLevel.fromJson(json)).toList();
   }
 
-//  Future<Map<String, StockData>> getBatchStockData(List<String> symbols) async {
-//    if (symbols.isEmpty) {
-//      return {};
-//    }
-//
-//    Map json = await _makeRequest(
-//        '/stock/market/batch?symbols=${symbols.join(',')}&types=quote,chart&range=1d');
-//    return Map<String, StockData>.from(json.map((symbol, data) =>
-//        MapEntry<String, StockData>(symbol, StockData.fromJson(data))));
-//  }
+  Future<Balance> getBalances(String sessionToken, String accountNumber) async {
+    ApiResponse response = await _makeRequest(
+      '/accounts/$accountNumber/balances', 'GET', sessionToken: sessionToken);
+    return Balance.fromJson(response.data);
+  }
+
+  Future<List<Position>> getPositions(String sessionToken,
+    String accountNumber) async {
+    ApiResponse response = await _makeRequest(
+      '/accounts/$accountNumber/positions', 'GET', sessionToken: sessionToken);
+    return (response.data['items'] as List).map((json) =>
+      Position.fromJson(json)).toList();
+  }
 }
 
 class ApiException {
@@ -76,7 +86,7 @@ class ApiException {
   @override
   String toString() {
     return '''Bad API Response: $statusCode - $reasonPhrase
-    
-    $body''';
+
+$body''';
   }
 }
