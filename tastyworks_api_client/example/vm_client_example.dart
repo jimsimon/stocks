@@ -1,6 +1,7 @@
 import 'package:tastyworks_api_client/clients/vm_client.dart';
 import 'package:tastyworks_api_client/services/account-service.dart';
 import 'package:tastyworks_api_client/services/session-service.dart';
+import 'package:tastyworks_api_client/services/watchlist-service.dart';
 
 void main(List<String> args) async {
   final VmClient client = VmClient();
@@ -24,4 +25,8 @@ void main(List<String> args) async {
   
   var position = await accountService.getPositions(accountNumber);
   print(position);
+
+  final watchlistService = WatchlistService(client, sessionToken);
+  var watchlists = await watchlistService.getWatchlists();
+  print(watchlists);
 }
