@@ -23,7 +23,7 @@ class StockSymbol {
   final int liquidityRating;
   final String liquidityValue;
   final List<Notability> notabilities;
-  final ResearchTeam research_team;
+  final ResearchTeam researchTeam;
   final String symbol;
   final String tosVolatilityPercentile;
   final String volatilityIndex;
