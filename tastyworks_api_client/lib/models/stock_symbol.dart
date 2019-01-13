@@ -1,4 +1,9 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:tastyworks_api_client/models/earnings.dart';
+import 'package:tastyworks_api_client/models/expiration_volatility.dart';
+import 'package:tastyworks_api_client/models/iv_percentile_input.dart';
+import 'package:tastyworks_api_client/models/notability.dart';
+import 'package:tastyworks_api_client/models/research_team.dart';
 
 part 'stock_symbol.g.dart';
 
@@ -8,52 +13,30 @@ class StockSymbol {
   final String description;
   final DateTime dividendExDate;
   final String dividendRatePerShare;
-
-//  earnings: {
-//    actual_eps: "1.08"
-//    consensus_estimate: "1.25"
-//    expected_report_date: "2019-01-30"
-//    is_estimated: false
-//    is_visible: true
-//    late_flag: 0
-//    quarter_end_date: "2018-12-01"
-//    time_of_day_code: "AMC"
-//  }
+  final Earnings earnings;
   final String exchange;
-
-//  expiration_volatilities: [
-//    {expiration_date: "2019-12-20", option_chain_type: "standard", implied_volatility: "20.70406040096445"}
-//  ]
+  final List<ExpirationVolatility> expirationVolatilities;
   final bool hasWeeklyOptions;
-
-//  implied_volatility_percentile_input: {
-//    mean_1y: "16.73067168431563"
-//    mean_6m: "17.09359936980892"
-//    mean_30d: "24.29690194379774"
-//    mean_60d: "22.80278994186752"
-//    snapshot_at: "2019-01-11"
-//    standard_deviation_1y: "5.741404954137365"
-//    standard_deviation_6m: "6.408161292915959"
-//    standard_deviation_30d: "6.403880226289415"
-//    standard_deviation_60d: "5.365321418016254"
-//  }
+  final IVPercentileInput impliedVolatilityPercentileInput;
   final bool isNotable;
   final String liquidityRank;
   final int liquidityRating;
   final String liquidityValue;
-
-//  notabilities: [{name: "Liquid ETF", description: ""}]
-//  research_team: {corr_SPY_3month: "1.0"}
+  final List<Notability> notabilities;
+  final ResearchTeam research_team;
   final String symbol;
   final String tosVolatilityPercentile;
   final String volatilityIndex;
+  @JsonKey(name: 'volatility_index_5_day_change')
   final String volatilityIndex5DayChange;
   final String volatilityPercentile;
 
   StockSymbol(this.beta, this.description, this.dividendExDate,
-    this.dividendRatePerShare, this.exchange, this.hasWeeklyOptions,
-    this.isNotable, this.liquidityRank, this.liquidityRating,
-    this.liquidityValue, this.symbol, this.tosVolatilityPercentile,
+    this.dividendRatePerShare, this.earnings, this.exchange,
+    this.expirationVolatilities, this.hasWeeklyOptions,
+    this.impliedVolatilityPercentileInput, this.isNotable, this.liquidityRank,
+    this.liquidityRating, this.liquidityValue, this.notabilities,
+    this.research_team, this.symbol, this.tosVolatilityPercentile,
     this.volatilityIndex, this.volatilityIndex5DayChange,
     this.volatilityPercentile);
 
@@ -64,6 +47,6 @@ class StockSymbol {
 
   @override
   String toString() {
-    return 'StockSymbol{beta: $beta, description: $description, dividendExDate: $dividendExDate, dividendRatePerShare: $dividendRatePerShare, exchange: $exchange, hasWeeklyOptions: $hasWeeklyOptions, isNotable: $isNotable, liquidityRank: $liquidityRank, liquidityRating: $liquidityRating, liquidityValue: $liquidityValue, symbol: $symbol, tosVolatilityPercentile: $tosVolatilityPercentile, volatilityIndex: $volatilityIndex, volatilityIndex5DayChange: $volatilityIndex5DayChange, volatilityPercentile: $volatilityPercentile}';
+    return 'StockSymbol{beta: $beta, description: $description, dividendExDate: $dividendExDate, dividendRatePerShare: $dividendRatePerShare, earnings: $earnings, exchange: $exchange, expirationVolatilities: $expirationVolatilities, hasWeeklyOptions: $hasWeeklyOptions, impliedVolatilityPercentileInput: $impliedVolatilityPercentileInput, isNotable: $isNotable, liquidityRank: $liquidityRank, liquidityRating: $liquidityRating, liquidityValue: $liquidityValue, notabilities: $notabilities, research_team: $research_team, symbol: $symbol, tosVolatilityPercentile: $tosVolatilityPercentile, volatilityIndex: $volatilityIndex, volatilityIndex5DayChange: $volatilityIndex5DayChange, volatilityPercentile: $volatilityPercentile}';
   }
 }

@@ -9,7 +9,8 @@ class WatchlistEntry {
 
   WatchlistEntry(this.instrumentType, this.symbol);
 
-  factory WatchlistEntry.fromJson(Map<String, dynamic> json) => _$WatchlistEntryFromJson(json);
+  factory WatchlistEntry.fromJson(Map<String, dynamic> json) =>
+    _$WatchlistEntryFromJson(json);
 
   Map<String, dynamic> toJson() => _$WatchlistEntryToJson(this);
 

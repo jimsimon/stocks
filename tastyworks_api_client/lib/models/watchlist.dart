@@ -10,7 +10,8 @@ class Watchlist {
 
   Watchlist(this.name, this.watchlistEntries);
 
-  factory Watchlist.fromJson(Map<String, dynamic> json) => _$WatchlistFromJson(json);
+  factory Watchlist.fromJson(Map<String, dynamic> json) =>
+    _$WatchlistFromJson(json);
 
   Map<String, dynamic> toJson() => _$WatchlistToJson(this);
 
