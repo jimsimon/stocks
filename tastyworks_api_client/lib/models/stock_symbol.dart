@@ -36,7 +36,7 @@ class StockSymbol {
     this.expirationVolatilities, this.hasWeeklyOptions,
     this.impliedVolatilityPercentileInput, this.isNotable, this.liquidityRank,
     this.liquidityRating, this.liquidityValue, this.notabilities,
-    this.research_team, this.symbol, this.tosVolatilityPercentile,
+    this.researchTeam, this.symbol, this.tosVolatilityPercentile,
     this.volatilityIndex, this.volatilityIndex5DayChange,
     this.volatilityPercentile);
 
@@ -47,6 +47,6 @@ class StockSymbol {
 
   @override
   String toString() {
-    return 'StockSymbol{beta: $beta, description: $description, dividendExDate: $dividendExDate, dividendRatePerShare: $dividendRatePerShare, earnings: $earnings, exchange: $exchange, expirationVolatilities: $expirationVolatilities, hasWeeklyOptions: $hasWeeklyOptions, impliedVolatilityPercentileInput: $impliedVolatilityPercentileInput, isNotable: $isNotable, liquidityRank: $liquidityRank, liquidityRating: $liquidityRating, liquidityValue: $liquidityValue, notabilities: $notabilities, research_team: $research_team, symbol: $symbol, tosVolatilityPercentile: $tosVolatilityPercentile, volatilityIndex: $volatilityIndex, volatilityIndex5DayChange: $volatilityIndex5DayChange, volatilityPercentile: $volatilityPercentile}';
+    return 'StockSymbol{beta: $beta, description: $description, dividendExDate: $dividendExDate, dividendRatePerShare: $dividendRatePerShare, earnings: $earnings, exchange: $exchange, expirationVolatilities: $expirationVolatilities, hasWeeklyOptions: $hasWeeklyOptions, impliedVolatilityPercentileInput: $impliedVolatilityPercentileInput, isNotable: $isNotable, liquidityRank: $liquidityRank, liquidityRating: $liquidityRating, liquidityValue: $liquidityValue, notabilities: $notabilities, researchTeam: $researchTeam, symbol: $symbol, tosVolatilityPercentile: $tosVolatilityPercentile, volatilityIndex: $volatilityIndex, volatilityIndex5DayChange: $volatilityIndex5DayChange, volatilityPercentile: $volatilityPercentile}';
   }
 }

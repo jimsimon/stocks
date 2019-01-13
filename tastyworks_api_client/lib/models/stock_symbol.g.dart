@@ -65,7 +65,7 @@ Map<String, dynamic> _$StockSymbolToJson(StockSymbol instance) =>
       'liquidity_rating': instance.liquidityRating,
       'liquidity_value': instance.liquidityValue,
       'notabilities': instance.notabilities,
-      'research_team': instance.research_team,
+      'research_team': instance.researchTeam,
       'symbol': instance.symbol,
       'tos_volatility_percentile': instance.tosVolatilityPercentile,
       'volatility_index': instance.volatilityIndex,
