@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:iex_trading_client/data_transfer_objects.dart';
 import 'package:mobile/src/store/app_state.dart';
 import 'package:redux/redux.dart';
 
@@ -16,41 +15,45 @@ class HomeScreen extends StatelessWidget {
         builder: (context, viewModel) {
           return new Scaffold(
               appBar: new AppBar(
+                automaticallyImplyLeading: false,
                 title: new Text(title),
                 actions: <Widget>[
                   new IconButton(
-                      icon: new Icon(Icons.search),
-                      onPressed: viewModel.navigateToSearchSceen)
+                      icon: new Icon(Icons.settings),
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/settings');
+                      })
                 ],
               ),
-              drawer: new Drawer(
-                  child: new ListView(
-                      // Important: Remove any padding from the ListView.
-                      padding: EdgeInsets.zero,
-                      children: <Widget>[
-                    new UserAccountsDrawerHeader(
-                      accountName: new Text('Jim Simon'),
-                      accountEmail: new Text('jim.j.simon@gmail.com'),
-                      currentAccountPicture: new CircleAvatar(),
-                    ),
-                    new ListTile(
-                      leading: new Icon(Icons.settings),
-                      title: new Text('Settings'),
-                      onTap: () {
-                        Navigator.of(context).pushNamed('/settings');
-                      },
-                    ),
-                  ])),
-              body: buildBody(context, viewModel));
+              body: buildBody(context, viewModel),
+              bottomNavigationBar: new BottomNavigationBar(
+                items: <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home),
+                    title: Text('Home')
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.watch),
+                    title: Text('Watchlist')
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.list),
+                    title: Text('Positions')
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.add),
+                    title: Text('Trade')
+                  ),
+                ],
+                currentIndex: currentIndex,
+                type: BottomNavigationBarType.fixed,
+                onTap: viewModel.handleBottomNavigationTap
+              ));
         });
   }
 
   Widget buildBody(BuildContext context, HomeScreenViewModel viewModel) {
-    if (viewModel.favoriteSymbols.isEmpty) {
-      return buildEmptyState(context, viewModel);
-    } else {
-      return buildFavoritesList(context, viewModel);
-    }
+    return buildEmptyState(context, viewModel);
   }
 
   Widget buildEmptyState(BuildContext context, HomeScreenViewModel viewModel) {
@@ -60,47 +63,16 @@ class HomeScreen extends StatelessWidget {
         children: <Widget>[
           new Container(
             child:
-                new Text("You have no favorite stocks!", textScaleFactor: 1.5),
+                new Text("Nothing here yet", textScaleFactor: 1.5),
             margin: EdgeInsets.only(bottom: 16.0),
           ),
-          new RaisedButton.icon(
-            label: new Text("Add Favorites"),
-            onPressed: viewModel.navigateToSearchSceen,
-            icon: new Icon(Icons.add),
-            color: Theme.of(context).primaryColor,
-            textColor: Theme.of(context).primaryTextTheme.title.color,
-          )
         ],
       ),
     );
   }
 
-  Widget buildFavoritesList(
-      BuildContext context, HomeScreenViewModel viewModel) {
-    return new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          new Text('Favorites'),
-          new Card(
-              child: new ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: viewModel.favoriteSymbols.length,
-                  itemBuilder: (buildContext, index) {
-                    var stockSymbol =
-                        viewModel.favoriteSymbols.values.elementAt(index);
-                    var stockData = viewModel.stockData[stockSymbol.symbol];
-                    return new ListTile(
-                        title: new Text(stockSymbol.symbol),
-                        trailing: buildStockPrice(stockData));
-                  }))
-        ]);
-  }
-
-  Widget buildStockPrice(StockData stockData) {
-    if (stockData != null) {
-      return new Text('\$' + stockData.quote.latestPrice.toStringAsFixed(2));
-    }
-    return new CircularProgressIndicator();
+  get currentIndex {
+    return ['Home', 'Watchlist', 'Positions', 'Trade'].indexOf(title);
   }
 }
 
@@ -110,15 +82,32 @@ class HomeScreenViewModel {
 
   HomeScreenViewModel(this.store, this.context);
 
-  navigateToSearchSceen() {
-    store.dispatch(new NavigateAction(new Navigation(context, '/search')));
+//  navigateToSearchSceen() {
+//    store.dispatch(new NavigateAction(new Navigation(context, '/search')));
+//  }
+
+//  fetchStockData(int executionCount) {
+//    store.dispatch(new FetchFavoritesDataAction(favoriteSymbols));
+//  }
+
+//  Map<String, StockSymbol> get favoriteSymbols => store.state.favoriteSymbols;
+//
+//  Map<String, StockData> get stockData => store.state.stockData;
+
+  void handleBottomNavigationTap(int value) {
+    var route;
+    if (value == 0) {
+      route = '/home';
+    } else if (value == 1) {
+      route = '/watchlist';
+    } else if (value == 2) {
+      route = '/positions';
+    } else if (value == 3) {
+      route = '/trade';
+    }
+
+    if (route != null) {
+      store.dispatch(NavigateAction(Navigation(context, route)));
+    }
   }
-
-  fetchStockData(int executionCount) {
-    store.dispatch(new FetchFavoritesDataAction(favoriteSymbols));
-  }
-
-  Map<String, StockSymbol> get favoriteSymbols => store.state.favoriteSymbols;
-
-  Map<String, StockData> get stockData => store.state.stockData;
 }

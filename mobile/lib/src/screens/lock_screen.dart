@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:mobile/src/widgets/pin_entry.dart';
 import 'package:mobile/src/store/app_state.dart';
@@ -37,7 +38,8 @@ class LockScreen extends StatelessWidget {
   }
 
   Future<bool> onWillPop() async {
-    return true;
+    SystemNavigator.pop();
+    return false;
   }
 }
 

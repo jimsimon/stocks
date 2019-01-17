@@ -1,4 +1,3 @@
-import 'package:iex_trading_client/api_client.dart';
 import 'package:mobile/src/store/app_state.dart';
 import 'package:redux/redux.dart';
 import 'dart:async';

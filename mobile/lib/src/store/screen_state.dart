@@ -1,17 +1,17 @@
 import 'package:mobile/src/store/search_screen_state.dart';
-import 'package:mobile/src/store/sign_up_screen_state.dart';
+import 'package:mobile/src/store/login_screen_state.dart';
 import 'package:redux/redux.dart';
 
 class ScreenState {
   final SearchScreenState search;
-  final SignUpScreenState signUp;
+  final LoginScreenState login;
 
-  ScreenState({this.search, this.signUp});
+  ScreenState({this.search, this.login});
 
   factory ScreenState.initial() =>
     new ScreenState(
       search: new SearchScreenState(),
-      signUp: new SignUpScreenState()
+      login: new LoginScreenState()
     );
 }
 
@@ -19,7 +19,7 @@ ScreenState screenStateReducer(ScreenState state, action) {
   return new ScreenState(
     search: new TypedReducer<SearchScreenState, dynamic>(searchScreenReducer)(
       state.search, action),
-    signUp: new TypedReducer<SignUpScreenState, dynamic>(signUpScreenReducer)(
-      state.signUp, action)
+    login: new TypedReducer<LoginScreenState, dynamic>(loginScreenReducer)(
+      state.login, action)
   );
 }

@@ -7,11 +7,15 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  after_layout: ^1.0.7
   cupertino_icons: ^0.1.0
+  local_auth: ^0.3.1
   flutter_redux: "^0.5.0"
-  firebase_auth: "^0.5.9"
-  iex_trading_client:
-    path: ../iex_trading_client
+  flutter_secure_storage: ^3.1.2
+  fluro: "^1.4.0"
+  shared_preferences: ^0.4.3
+  tastyworks_api_client:
+    path: ../tastyworks_api_client
 
 dev_dependencies:
   flutter_test:
