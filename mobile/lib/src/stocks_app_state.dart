@@ -37,7 +37,7 @@ class StocksAppState extends State<StocksApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      if (store.state.session != null && !store.state.locked) {
+      if (store.state.session != null && !store.state.locked && store.state.biometricAuthEnabled) {
         store.dispatch(SetLockedAction(true));
         navigatorKey.currentState.pushNamed('/locked');
       }
