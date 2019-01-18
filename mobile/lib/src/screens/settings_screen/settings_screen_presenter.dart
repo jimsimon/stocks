@@ -30,24 +30,16 @@ class SettingsScreenPresenter extends StatelessWidget {
             future: viewModel.biometricsAvailable,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.hasData && snapshot.data == true) {
-                return ListTile(
+                return SwitchListTile(
                   title: new Text('Enable Biometric Security'),
                   subtitle: new Text('Fingerprint or facial recognition'),
-                  trailing: new Switch(value: viewModel.biometricAuthEnabled,
-                    onChanged: viewModel.onBiometricAuthenticationToggled),
+                  value: viewModel.biometricAuthEnabled,
+                  onChanged: viewModel.onBiometricAuthenticationToggled,
                 );
               } else {
                 return SizedBox();
               }
             }
-          ),
-          new ListTile(
-            title: new Text('Enable PIN'),
-            trailing: new Switch(value: false, onChanged: (value) {}),
-          ),
-          new ListTile(
-            title: new Text('Set PIN'),
-            enabled: false,
           ),
         ],
       ));

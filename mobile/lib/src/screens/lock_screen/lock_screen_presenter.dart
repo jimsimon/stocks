@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:mobile/src/screens/lock_screen/lock_screen_vm.dart';
-import 'package:mobile/src/widgets/pin_entry/pin_entry.dart';
 
 typedef void OnSuccess(BuildContext context);
 
@@ -19,23 +17,21 @@ class LockScreenPresenter extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: onWillPop,
-      child: new PinEntry(
-        title: 'Enter PIN',
-        pinSize: 4,
-        onCodeEntered: (List<int> digits) {
-          for (var i = 0; i < digits.length; i++) {
-            if (digits[i] != viewModel.lockCode[i]) {
-              return false;
-            }
-          }
-          viewModel.unlockApp(context);
-          return true;
-        }),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.lock,
+              size: 100.0,
+            )
+          ]
+        )
+      )
     );
   }
 
   Future<bool> onWillPop() async {
-    SystemNavigator.pop();
     return false;
   }
 }

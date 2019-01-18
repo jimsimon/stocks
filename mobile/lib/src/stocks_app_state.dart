@@ -70,7 +70,7 @@ class StocksAppState extends State<StocksApp> with WidgetsBindingObserver {
     router.define('/', handler: new Handler(
       handlerFunc: (context, params) => LoginScreen(store: store)));
     router.define('/locked', handler: new Handler(
-      handlerFunc: (context, params) => LockScreen()));
+      handlerFunc: (context, params) => LockScreen(store: store)));
     router.define('/home', handler: new Handler(
       handlerFunc: (context, params) => HomeScreen(title: 'Home')));
     router.define('/positions', handler: Handler(
