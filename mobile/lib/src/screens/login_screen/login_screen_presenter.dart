@@ -30,12 +30,14 @@ class LoginScreenPresenter extends StatelessWidget {
               textCapitalization: TextCapitalization.none,
               autocorrect: false,
               autofocus: true,
-              onChanged: !viewModel.loading ? viewModel.handleUsernameOrEmailChange : null,
+              enabled: !viewModel.loading,
+              onChanged: viewModel.handleUsernameOrEmailChange,
             ),
             new TextField(
               obscureText: true,
               decoration: new InputDecoration(hintText: 'Password'),
-              onChanged: !viewModel.loading ? viewModel.handlePasswordChange : null,
+              enabled: !viewModel.loading,
+              onChanged: viewModel.handlePasswordChange,
             ),
             new FlatButton(
               onPressed: !viewModel.loading ? viewModel.handleLogin : null,
