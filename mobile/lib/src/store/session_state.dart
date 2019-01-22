@@ -17,7 +17,7 @@ class AccountsState {
     this.active
   });
 
-  AccountsState copyWith({accounts, loading, active}) {
+  AccountsState copyWith({accounts, leading, active}) {
     return AccountsState(
       accounts: accounts ?? this.accounts,
       loading: loading ?? this.loading,
