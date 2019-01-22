@@ -11,10 +11,9 @@ import 'package:mobile/src/store/app_state.dart';
 import 'package:redux/redux.dart';
 
 class StocksAppState extends State<StocksApp> with WidgetsBindingObserver {
-  final GlobalKey<NavigatorState> navigatorKey =
-  GlobalKey<NavigatorState>();
-
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   final Router router = Router();
+
   final Store<AppState> store;
   bool locked;
 
@@ -68,9 +67,9 @@ class StocksAppState extends State<StocksApp> with WidgetsBindingObserver {
         print("ROUTE WAS NOT FOUND !!!");
       });
     router.define('/', handler: new Handler(
-      handlerFunc: (context, params) => LoginScreen(store: store)));
+      handlerFunc: (context, params) => LoginScreen()));
     router.define('/locked', handler: new Handler(
-      handlerFunc: (context, params) => LockScreen(store: store)));
+      handlerFunc: (context, params) => LockScreen()));
     router.define('/home', handler: new Handler(
       handlerFunc: (context, params) => HomeScreen(title: 'Home')));
     router.define('/positions', handler: Handler(

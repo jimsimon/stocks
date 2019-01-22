@@ -38,7 +38,8 @@ class LoginScreenPresenter extends StatelessWidget {
               onChanged: viewModel.handlePasswordChange,
             ),
             new FlatButton(
-              onPressed: viewModel.onLogin, child: new Text('Login')),
+              onPressed: viewModel.handleLogin,
+              child: new Text('Login')),
           ]..removeWhere((w) => w == null),
         ),
       )

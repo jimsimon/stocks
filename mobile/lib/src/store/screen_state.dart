@@ -6,7 +6,10 @@ class ScreenState {
   final SearchScreenState search;
   final LoginScreenState login;
 
-  ScreenState({this.search, this.login});
+  ScreenState({
+    this.search,
+    this.login
+  });
 
   factory ScreenState.initial() =>
     new ScreenState(

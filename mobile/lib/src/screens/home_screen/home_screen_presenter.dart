@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/src/screens/home_screen/home_screen_vm.dart';
+import 'package:mobile/src/widgets/accounts_dropdown_button/accounts_dropdown_button.dart';
 
 class HomeScreenPresenter extends StatelessWidget {
   final HomeScreenViewModel viewModel;
@@ -16,7 +17,7 @@ class HomeScreenPresenter extends StatelessWidget {
     return new Scaffold(
       appBar: new AppBar(
         automaticallyImplyLeading: false,
-        title: new Text(title),
+        title: AccountsDropdownButton(),
         actions: <Widget>[
           new IconButton(
             icon: new Icon(Icons.settings),

@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
+import 'package:mobile/src/store/accounts_state.dart';
 import 'package:mobile/src/store/app_state.dart';
 import 'package:redux/redux.dart';
+import 'package:tastyworks_api_client/models/account.dart';
 
 class HomeScreenViewModel {
   final Store<AppState> store;
@@ -24,4 +26,14 @@ class HomeScreenViewModel {
       store.dispatch(NavigateAction(Navigation(context, route)));
     }
   }
+
+  void loadAccounts () {
+//    store.dispatch(FetchAccountsAction(store.state.session));
+  }
+
+  void handleAccountsDropdownChange(Account account) {
+    print(account);
+  }
+
+  List<Account> get accounts => [];
 }

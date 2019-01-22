@@ -1,6 +1,5 @@
 import 'package:redux/redux.dart';
 
-
 class LoginScreenState {
   final String usernameOrEmail;
   final String password;
