@@ -12,7 +12,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new StoreConnector<AppState, HomeScreenViewModel>(
-      onInitialBuild: handleInitialBuild,
       converter: (store) => HomeScreenViewModel(store, context),
       builder: (context, viewModel) {
         return HomeScreenPresenter(
@@ -43,9 +42,5 @@ class HomeScreen extends StatelessWidget {
 
   get currentIndex {
     return ['Home', 'Watchlist', 'Positions', 'Trade'].indexOf(title);
-  }
-
-  void handleInitialBuild(HomeScreenViewModel viewModel) {
-    viewModel.loadAccounts();
   }
 }

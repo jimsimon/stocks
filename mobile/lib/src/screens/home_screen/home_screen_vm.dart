@@ -27,10 +27,6 @@ class HomeScreenViewModel {
     }
   }
 
-  void loadAccounts () {
-//    store.dispatch(FetchAccountsAction(store.state.session));
-  }
-
   void handleAccountsDropdownChange(Account account) {
     print(account);
   }
