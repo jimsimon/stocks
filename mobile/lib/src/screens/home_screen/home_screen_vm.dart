@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:mobile/src/store/accounts_state.dart';
 import 'package:mobile/src/store/app_state.dart';
 import 'package:redux/redux.dart';
 import 'package:tastyworks_api_client/models/account.dart';

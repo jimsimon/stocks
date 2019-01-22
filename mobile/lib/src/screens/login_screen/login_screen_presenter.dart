@@ -38,9 +38,11 @@ class LoginScreenPresenter extends StatelessWidget {
               onChanged: viewModel.handlePasswordChange,
             ),
             new FlatButton(
-              onPressed: viewModel.handleLogin,
-              child: new Text('Login')),
-          ]..removeWhere((w) => w == null),
+              onPressed: !viewModel.loading ? viewModel.handleLogin : null,
+              child: viewModel.loading ? CircularProgressIndicator() : Text(
+                'Login')),
+          ]
+            ..removeWhere((w) => w == null),
         ),
       )
     );
@@ -52,7 +54,7 @@ class LoginScreenPresenter extends StatelessWidget {
     }
 
     return new Text(viewModel.errorMessage, style: TextStyle(color: Theme
-                .of(context)
-                .errorColor));
+      .of(context)
+      .errorColor));
   }
 }

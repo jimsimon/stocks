@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/src/store/accounts_state.dart';
 import 'package:mobile/src/store/app_state.dart';
 import 'package:mobile/src/store/login_screen_state.dart';
+import 'package:mobile/src/store/session_state.dart';
 import 'package:redux/redux.dart';
 
 class LoginScreenViewModel {
@@ -13,6 +14,8 @@ class LoginScreenViewModel {
   get errorMessage => store.state.screens.login.error;
 
   get biometricAuthEnabled => store.state.biometricAuthEnabled;
+
+  get loading => store.state.sessionState.loading;
 
   handleUsernameOrEmailChange(String usernameOrEmail) {
     store.dispatch(SetUsernameOrEmailAction(usernameOrEmail));
@@ -31,7 +34,7 @@ class LoginScreenViewModel {
     store.dispatch(loginAction);
     await loginAction.onComplete;
 
-    var fetchAccountsAction = FetchAccountsAction(store.state.session);
+    var fetchAccountsAction = FetchAccountsAction(store.state.sessionState.session);
     store.dispatch(fetchAccountsAction);
     await fetchAccountsAction.onComplete;
 

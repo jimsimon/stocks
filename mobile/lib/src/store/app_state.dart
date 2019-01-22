@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/src/store/accounts_state.dart';
-import 'package:mobile/src/store/login_screen_state.dart';
-import 'package:mobile/src/store/middleware/thunk_middleware.dart';
 import 'package:mobile/src/store/screen_state.dart';
+import 'package:mobile/src/store/session_state.dart';
 import 'package:redux/redux.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:tastyworks_api_client/clients/vm_client.dart';
-import 'package:tastyworks_api_client/models/session.dart';
-import 'package:tastyworks_api_client/services/session_service.dart';
 
 class AppState {
   final ScreenState screens;
   final String currentRoute;
   final List<int> lockCode = [1, 2, 3, 4];
-  final Session session;
+  final SessionState sessionState;
   final bool locked;
   final bool biometricAuthEnabled;
   final AccountsState accountsState;
@@ -21,7 +16,7 @@ class AppState {
   AppState({
     this.screens,
     this.currentRoute = '/',
-    this.session,
+    this.sessionState,
     this.locked = false,
     this.biometricAuthEnabled = false,
     this.accountsState
@@ -30,13 +25,14 @@ class AppState {
   factory AppState.initial() =>
     new AppState(
       screens: ScreenState.initial(),
-      accountsState: AccountsState()
+      accountsState: AccountsState(),
+      sessionState: SessionState()
     );
 
   AppState copyWith({
     screens,
     currentRoute,
-    session,
+    sessionState,
     locked,
     biometricAuthEnabled,
     accountsState
@@ -44,7 +40,7 @@ class AppState {
     return new AppState(
       screens: screens ?? this.screens,
       currentRoute: currentRoute ?? this.currentRoute,
-      session: session ?? this.session,
+      sessionState: sessionState ?? this.sessionState,
       locked: locked ?? this.locked,
       biometricAuthEnabled: biometricAuthEnabled ?? this.biometricAuthEnabled,
       accountsState: accountsState ?? this.accountsState
@@ -66,11 +62,13 @@ AppState appStateReducer(AppState state, action) {
       state.screens, action),
     currentRoute: new TypedReducer(navigate)(
       state.currentRoute, action),
-    session: new TypedReducer(storeSession)(
-      state.session, action),
+    sessionState: new TypedReducer(sessionStateReducer)(
+      state.sessionState, action),
     locked: new TypedReducer(storeLocked)(state.locked, action),
-    biometricAuthEnabled: new TypedReducer(storeBiometricAuthEnabled)(state.biometricAuthEnabled, action),
-    accountsState: new TypedReducer(accountsStateReducer)(state.accountsState, action)
+    biometricAuthEnabled: new TypedReducer(storeBiometricAuthEnabled)(
+      state.biometricAuthEnabled, action),
+    accountsState: new TypedReducer(accountsStateReducer)(
+      state.accountsState, action)
   );
 }
 
@@ -82,10 +80,6 @@ String navigate(String state, NavigateAction action) {
     navigator.pushReplacementNamed(action.navigation.route);
   }
   return action.navigation.route;
-}
-
-Session storeSession(Session state, SetSessionAction action) {
-  return action.session;
 }
 
 bool storeLocked(bool state, SetLockedAction action) {
@@ -100,37 +94,6 @@ class NavigateAction {
   final Navigation navigation;
 
   NavigateAction(this.navigation);
-}
-
-class LoginAction extends ThunkAction<AppState> {
-  final BuildContext context;
-  final String usernameOrEmail;
-  final String password;
-
-  LoginAction(this.context, this.usernameOrEmail, this.password);
-  
-  call(Store<AppState> store) async {
-    var apiClient = VmClient();
-    var sessionService = SessionService(apiClient);
-    final storage = new FlutterSecureStorage();
-    try {
-      var session = await sessionService.createSession(usernameOrEmail, password);
-      await sessionService.validateSession(session.sessionToken);
-      await storage.write(key: 'usernameOrEmail', value: usernameOrEmail);
-      await storage.write(key: 'password', value: password);
-      store.dispatch(SetSessionAction(session));
-    } on ApiException catch (e) {
-      await storage.delete(key: 'usernameOrEmail');
-      await storage.delete(key: 'password');
-      store.dispatch(SetLoginErrorAction(e?.response?.message));
-    }
-  }
-}
-
-class SetSessionAction {
-  final Session session;
-
-  SetSessionAction(this.session);
 }
 
 class SetLockedAction {

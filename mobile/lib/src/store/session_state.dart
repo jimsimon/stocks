@@ -1,86 +1,81 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile/src/store/app_state.dart';
+import 'package:mobile/src/store/login_screen_state.dart';
 import 'package:mobile/src/store/middleware/thunk_middleware.dart';
 import 'package:redux/redux.dart';
 import 'package:tastyworks_api_client/clients/vm_client.dart';
-import 'package:tastyworks_api_client/models/account_with_level.dart';
 import 'package:tastyworks_api_client/models/session.dart';
-import 'package:tastyworks_api_client/services/account_service.dart';
+import 'package:tastyworks_api_client/services/session_service.dart';
 
-class AccountsState {
-  final List<AccountWithLevel> accounts;
+class SessionState {
+  final Session session;
   final bool loading;
-  final AccountWithLevel active;
 
-  AccountsState({
-    this.accounts = const [],
+  SessionState({
+    this.session,
     this.loading = false,
-    this.active
   });
 
-  AccountsState copyWith({accounts, leading, active}) {
-    return AccountsState(
-      accounts: accounts ?? this.accounts,
-      loading: loading ?? this.loading,
-      active: active ?? this.active
+  SessionState copyWith({session, loading}) {
+    return SessionState(
+      session: session ?? this.session,
+      loading: loading ?? this.loading
     );
   }
 }
 
-class FetchAccountsAction extends ThunkAction<AppState> {
-  final Session session;
+class LoginAction extends ThunkAction<AppState> {
+  final BuildContext context;
+  final String usernameOrEmail;
+  final String password;
 
-  FetchAccountsAction(this.session);
+  LoginAction(this.context, this.usernameOrEmail, this.password);
 
-  call (Store<AppState> store) async {
-    var apiClient = VmClient();
-    var accountService = AccountService(apiClient, session.sessionToken);
+  call(Store<AppState> store) async {
+    final storage = new FlutterSecureStorage();
     try {
-      store.dispatch(SetAccountsLoadingAction(true));
-      var accounts = await accountService.getAccounts();
-      store.dispatch(SetActiveAccountAction(accounts[0]));
-      store.dispatch(SetAccountsAction(accounts));
+      store.dispatch(SetSessionLoadingAction(true));
+      var apiClient = VmClient();
+      var sessionService = SessionService(apiClient);
+      var session = await sessionService.createSession(usernameOrEmail, password);
+      await sessionService.validateSession(session.sessionToken);
+      await storage.write(key: 'usernameOrEmail', value: usernameOrEmail);
+      await storage.write(key: 'password', value: password);
+      store.dispatch(SetSessionAction(session));
     } on ApiException catch (e) {
-//      store.dispatch(SetLoginErrorAction(e?.response?.message));
+      await storage.delete(key: 'usernameOrEmail');
+      await storage.delete(key: 'password');
+      store.dispatch(SetLoginErrorAction(e?.response?.message));
     } finally {
-      store.dispatch(SetAccountsLoadingAction(false));
+      store.dispatch(SetSessionLoadingAction(false));
     }
   }
 }
 
-class SetAccountsAction {
-  final List<AccountWithLevel> accounts;
+class SetSessionAction {
+  final Session session;
 
-  SetAccountsAction(this.accounts);
+  SetSessionAction(this.session);
 }
 
-class SetAccountsLoadingAction {
+class SetSessionLoadingAction {
   final bool loading;
 
-  SetAccountsLoadingAction(this.loading);
+  SetSessionLoadingAction(this.loading);
 }
 
-class SetActiveAccountAction {
-  final AccountWithLevel account;
-
-  SetActiveAccountAction(this.account);
-}
-
-AccountsState accountsStateReducer(AccountsState state, action) {
-  return AccountsState(
-    accounts: TypedReducer(setAccounts)(state.accounts, action),
-    loading: TypedReducer(setLoading)(state.loading, action),
-    active: TypedReducer(setActive)(state.active, action)
+SessionState sessionStateReducer(SessionState state, action) {
+  return SessionState(
+    session: TypedReducer(setSession)(state.session, action),
+    loading: TypedReducer(setLoading)(state.loading, action)
   );
 }
 
-bool setLoading(bool state, SetAccountsLoadingAction action) {
+bool setLoading(bool state, SetSessionLoadingAction action) {
   return action.loading;
 }
 
-List<AccountWithLevel> setAccounts(List<AccountWithLevel> state, SetAccountsAction action) {
-  return action.accounts;
-}
-
-AccountWithLevel setActive(AccountWithLevel state, SetActiveAccountAction action) {
-  return action.account;
+Session setSession(Session state, SetSessionAction action) {
+  return action.session;
 }

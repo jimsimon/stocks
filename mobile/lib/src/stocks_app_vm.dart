@@ -8,7 +8,7 @@ class StocksAppViewModel {
 
   StocksAppViewModel(this.store, this.context);
 
-  get session => store.state.session;
+  get session => store.state.sessionState.session;
 
   get locked => store.state.locked;
 }
