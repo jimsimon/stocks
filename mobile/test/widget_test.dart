@@ -8,22 +8,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mobile/src/stocks_app.dart';
+import 'package:mobile/src/store/app_state.dart';
+import 'package:mobile/src/store/middleware/thunk_middleware.dart';
+import 'package:redux/redux.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(new StocksApp());
+    final store = Store<AppState>(appStateReducer,
+      initialState: AppState.initial(),
+      middleware: [
+        ThunkMiddleware<AppState>()
+      ]);
+    await tester.pumpWidget(new StocksApp(store: store));
 
     // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    var textFields = find.byType(TextField);
+    expect(textFields, findsNWidgets(2));
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    var usernameField = tester.widget<TextField>(textFields.first);
+    expect(usernameField.decoration.hintText, 'Username or email address');
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    var passwordField = tester.widget<TextField>(textFields.last);
+    expect(passwordField.decoration.hintText, 'Password');
+
+    var loginButtonFinder = find.widgetWithText(FlatButton, 'Login');
+    var loginButton = tester.widget<FlatButton>(loginButtonFinder);
+    expect(loginButton.enabled, isTrue);
   });
 }
