@@ -13,7 +13,7 @@ import 'package:mobile/src/store/middleware/thunk_middleware.dart';
 import 'package:redux/redux.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('renders correctly on first paint', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     final store = Store<AppState>(appStateReducer,
       initialState: AppState.initial(),
@@ -22,7 +22,6 @@ void main() {
       ]);
     await tester.pumpWidget(new StocksApp(store: store));
 
-    // Verify that our counter starts at 0.
     var textFields = find.byType(TextField);
     expect(textFields, findsNWidgets(2));
 
