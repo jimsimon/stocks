@@ -2,3 +2,6 @@ version: '3'
 services:
   mobile:
     image: cirrusci/flutter
+    working_dir: /home/cirrus/mobile
+    volumes:
+      - ./mobile:/home/cirrus/mobile
