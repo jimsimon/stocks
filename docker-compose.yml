@@ -1,7 +1,5 @@
 version: '3'
 services:
   mobile:
-    image: cirrusci/flutter
+    build: .
     working_dir: /home/cirrus/code/mobile
-    volumes:
-      - .:/home/cirrus/code

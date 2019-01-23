@@ -4,5 +4,7 @@ services:
   - docker
 
 script:
+  - ls -la
+  - docker-compose run --rm mobile ls -la
   - docker-compose run --rm mobile flutter doctor
   - docker-compose run --rm mobile flutter test
