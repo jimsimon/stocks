@@ -4,4 +4,4 @@ services:
   - docker
 
 script:
-  - docker-compose run --rm mobile flutter test
+  - docker-compose run --rm mobile bash -c 'flutter test --coverage && pub global activate coveralls && $HOME/.pub-cache/bin/coveralls coverage/lcov.info'

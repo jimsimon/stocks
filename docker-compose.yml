@@ -3,3 +3,7 @@ services:
   mobile:
     build: .
     working_dir: /home/cirrus/code/mobile
+    environment:
+      - TRAVIS_JOB_ID
+      - TRAVIS_BRANCH
+      - COVERALLS_REPO_TOKEN
